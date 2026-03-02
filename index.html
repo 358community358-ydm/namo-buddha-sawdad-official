@@ -70,8 +70,17 @@ th {
     margin: 5px;
     border-radius: 8px;
 }
+
 .admin-panel {
     display: none;
+}
+
+.total-box {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+    color: #0d6efd;
 }
 </style>
 </head>
@@ -94,14 +103,19 @@ th {
 <th>रक्कम (₹)</th>
 </tr>
 </thead>
+
+<tbody id="donationList">
 <tr>
 <td>योगेश दत्तात्रय मोरे</td>
-<td>1000 rs </td>
+<td>1000</td>
 </tr>
 </tbody>
+
 </table>
 
-<h3>Total: ₹ <span id="totalAmount">0</span></h3>
+<div class="total-box">
+Total: ₹ <span id="totalAmount">0</span>
+</div>
 
 <hr>
 
@@ -115,6 +129,7 @@ th {
 <button onclick="login()">Login</button>
 
 <div class="admin-panel" id="adminPanel">
+
 <h3>नाव आणि रक्कम जोडा</h3>
 <input type="text" id="name" placeholder="नाव (मराठीत)">
 <input type="number" id="amount" placeholder="रक्कम (₹)">
@@ -123,11 +138,13 @@ th {
 <h3>फोटो जोडा</h3>
 <input type="file" id="photoInput">
 <button onclick="addPhoto()">फोटो Upload</button>
+
 </div>
 
 </div>
 
 <script>
+
 var correctPassword = "1234";
 
 function login() {
@@ -140,30 +157,16 @@ function login() {
     }
 }
 
-function loadData() {
-    var donations = JSON.parse(localStorage.getItem("donations")) || [];
-    var photos = JSON.parse(localStorage.getItem("photos")) || [];
+function calculateTotal() {
     var total = 0;
+    var rows = document.querySelectorAll("#donationList tr");
 
-    var table = document.getElementById("donationList");
-    table.innerHTML = "";
-
-    donations.forEach(function(d){
-        var row = table.insertRow();
-        row.insertCell(0).innerHTML = d.name;
-        row.insertCell(1).innerHTML = d.amount;
-        total += Number(d.amount);
+    rows.forEach(function(row){
+        var amount = row.cells[1].innerText;
+        total += Number(amount);
     });
 
     document.getElementById("totalAmount").innerText = total;
-
-    var gallery = document.getElementById("photoGallery");
-    gallery.innerHTML = "";
-    photos.forEach(function(p){
-        var img = document.createElement("img");
-        img.src = p;
-        gallery.appendChild(img);
-    });
 }
 
 function addDonation() {
@@ -175,30 +178,35 @@ function addDonation() {
         return;
     }
 
-    var donations = JSON.parse(localStorage.getItem("donations")) || [];
-    donations.push({name:name, amount:amount});
-    localStorage.setItem("donations", JSON.stringify(donations));
+    var table = document.getElementById("donationList");
+    var row = table.insertRow();
+
+    row.insertCell(0).innerHTML = name;
+    row.insertCell(1).innerHTML = amount;
 
     document.getElementById("name").value = "";
     document.getElementById("amount").value = "";
-    loadData();
+
+    calculateTotal();
 }
 
 function addPhoto(){
     var input = document.getElementById("photoInput");
+    if(!input.files[0]) return;
+
     var reader = new FileReader();
 
     reader.onload = function(e){
-        var photos = JSON.parse(localStorage.getItem("photos")) || [];
-        photos.push(e.target.result);
-        localStorage.setItem("photos", JSON.stringify(photos));
-        loadData();
+        var img = document.createElement("img");
+        img.src = e.target.result;
+        document.getElementById("photoGallery").appendChild(img);
     }
 
     reader.readAsDataURL(input.files[0]);
 }
 
-loadData();
+calculateTotal();
+
 </script>
 
 </body>
