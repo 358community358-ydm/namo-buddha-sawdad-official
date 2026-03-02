@@ -2,24 +2,32 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>१४ एप्रिल वर्गणी - Namo Buddha Sawdad</title>
+<title>१४ एप्रिल - Namo Buddha Sawdad</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body {
-    font-family: Arial;
-    background-color: #f4f8ff;
+    font-family: Arial, sans-serif;
     margin: 0;
+    background: linear-gradient(to right, #0d6efd, #003366);
+    color: white;
 }
 
 header {
-    background: #0d6efd;
-    color: white;
     text-align: center;
-    padding: 20px;
+    padding: 30px 15px;
 }
 
-section {
+.container {
+    background: white;
+    color: black;
+    margin: 20px;
     padding: 20px;
+    border-radius: 10px;
+}
+
+h2 {
+    text-align: center;
 }
 
 input, button {
@@ -33,25 +41,37 @@ button {
     color: white;
     border: none;
     cursor: pointer;
-    font-size: 16px;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #003366;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-    background: white;
+    margin-top: 15px;
 }
 
 th, td {
     border: 1px solid gray;
-    padding: 10px;
+    padding: 8px;
     text-align: center;
 }
 
 th {
-    background: #003366;
+    background: #0d6efd;
     color: white;
+}
+
+.gallery img {
+    width: 120px;
+    margin: 5px;
+    border-radius: 8px;
+}
+.admin-panel {
+    display: none;
 }
 </style>
 </head>
@@ -59,47 +79,122 @@ th {
 <body>
 
 <header>
-    <h1>१४ एप्रिल - भारत रत्न डॉ. बाबासाहेब आंबेडकर जयंती</h1>
-    <p>स्थळ: बुद्ध विहार, Sawdad</p>
+<h1>१४ एप्रिल - भारत रत्न डॉ. बाबासाहेब आंबेडकर जयंती</h1>
+<p>स्थळ: बुद्ध विहार, Sawdad</p>
 </header>
 
-<section>
-    <h2>वर्गणी नोंदणी</h2>
+<div class="container">
 
-    <input type="text" id="name" placeholder="नाव (मराठीत)">
-    <input type="number" id="amount" placeholder="रक्कम (₹)">
-    <button onclick="addDonation()">जोडा</button>
+<h2>वर्गणी यादी</h2>
 
-    <table>
-        <thead>
-            <tr>
-                <th>नाव</th>
-                <th>रक्कम (₹)</th>
-            </tr>
-        </thead>
-        <tbody id="donationList"></tbody>
-    </table>
-</section>
+<table>
+<thead>
+<tr>
+<th>नाव</th>
+<th>रक्कम (₹)</th>
+</tr>
+</thead>
+<tbody id="donationList"></tbody>
+</table>
+
+<h3>Total: ₹ <span id="totalAmount">0</span></h3>
+
+<hr>
+
+<h2>कार्यक्रम फोटो</h2>
+<div class="gallery" id="photoGallery"></div>
+
+<hr>
+
+<h2>Admin Login</h2>
+<input type="password" id="adminPassword" placeholder="Password टाका">
+<button onclick="login()">Login</button>
+
+<div class="admin-panel" id="adminPanel">
+<h3>नाव आणि रक्कम जोडा</h3>
+<input type="text" id="name" placeholder="नाव (मराठीत)">
+<input type="number" id="amount" placeholder="रक्कम (₹)">
+<button onclick="addDonation()">जोडा</button>
+
+<h3>फोटो जोडा</h3>
+<input type="file" id="photoInput">
+<button onclick="addPhoto()">फोटो Upload</button>
+</div>
+
+</div>
 
 <script>
+var correctPassword = "1234";
+
+function login() {
+    var pass = document.getElementById("adminPassword").value;
+    if(pass === correctPassword){
+        document.getElementById("adminPanel").style.display = "block";
+        alert("Admin Login Successful");
+    } else {
+        alert("Wrong Password");
+    }
+}
+
+function loadData() {
+    var donations = JSON.parse(localStorage.getItem("donations")) || [];
+    var photos = JSON.parse(localStorage.getItem("photos")) || [];
+    var total = 0;
+
+    var table = document.getElementById("donationList");
+    table.innerHTML = "";
+
+    donations.forEach(function(d){
+        var row = table.insertRow();
+        row.insertCell(0).innerHTML = d.name;
+        row.insertCell(1).innerHTML = d.amount;
+        total += Number(d.amount);
+    });
+
+    document.getElementById("totalAmount").innerText = total;
+
+    var gallery = document.getElementById("photoGallery");
+    gallery.innerHTML = "";
+    photos.forEach(function(p){
+        var img = document.createElement("img");
+        img.src = p;
+        gallery.appendChild(img);
+    });
+}
+
 function addDonation() {
     var name = document.getElementById("name").value;
     var amount = document.getElementById("amount").value;
 
-    if(name === "" || amount === "") {
-        alert("कृपया नाव आणि रक्कम भरा");
+    if(name === "" || amount === ""){
+        alert("माहिती भरा");
         return;
     }
 
-    var table = document.getElementById("donationList");
-    var row = table.insertRow();
-
-    row.insertCell(0).innerHTML = name;
-    row.insertCell(1).innerHTML = amount;
+    var donations = JSON.parse(localStorage.getItem("donations")) || [];
+    donations.push({name:name, amount:amount});
+    localStorage.setItem("donations", JSON.stringify(donations));
 
     document.getElementById("name").value = "";
     document.getElementById("amount").value = "";
+    loadData();
 }
+
+function addPhoto(){
+    var input = document.getElementById("photoInput");
+    var reader = new FileReader();
+
+    reader.onload = function(e){
+        var photos = JSON.parse(localStorage.getItem("photos")) || [];
+        photos.push(e.target.result);
+        localStorage.setItem("photos", JSON.stringify(photos));
+        loadData();
+    }
+
+    reader.readAsDataURL(input.files[0]);
+}
+
+loadData();
 </script>
 
 </body>
