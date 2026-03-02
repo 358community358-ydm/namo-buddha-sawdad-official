@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>१४ एप्रिल वर्गणी - Namo Buddha Sawdad</title>
+
+<style>
+body {
+    font-family: Arial;
+    background-color: #f4f8ff;
+    margin: 0;
+}
+
+header {
+    background: #0d6efd;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+section {
+    padding: 20px;
+}
+
+input, button {
+    padding: 10px;
+    margin: 5px 0;
+    width: 100%;
+}
+
+button {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+}
+
+th, td {
+    border: 1px solid gray;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #003366;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>१४ एप्रिल - भारत रत्न डॉ. बाबासाहेब आंबेडकर जयंती</h1>
+    <p>स्थळ: बुद्ध विहार, Sawdad</p>
+</header>
+
+<section>
+    <h2>वर्गणी नोंदणी</h2>
+
+    <input type="text" id="name" placeholder="नाव (मराठीत)">
+    <input type="number" id="amount" placeholder="रक्कम (₹)">
+    <button onclick="addDonation()">जोडा</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>नाव</th>
+                <th>रक्कम (₹)</th>
+            </tr>
+        </thead>
+        <tbody id="donationList"></tbody>
+    </table>
+</section>
+
+<script>
+function addDonation() {
+    var name = document.getElementById("name").value;
+    var amount = document.getElementById("amount").value;
+
+    if(name === "" || amount === "") {
+        alert("कृपया नाव आणि रक्कम भरा");
+        return;
+    }
+
+    var table = document.getElementById("donationList");
+    var row = table.insertRow();
+
+    row.insertCell(0).innerHTML = name;
+    row.insertCell(1).innerHTML = amount;
+
+    document.getElementById("name").value = "";
+    document.getElementById("amount").value = "";
+}
+</script>
+
+</body>
+</html>
